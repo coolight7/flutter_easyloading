@@ -40,15 +40,37 @@ class FlutterEasyLoading extends StatefulWidget {
 }
 
 class _FlutterEasyLoadingState extends State<FlutterEasyLoading> {
-  late EasyLoadingOverlayEntry _overlayEntry;
+  EasyLoadingOverlayEntry? overlayEntry;
+  EasyLoadingOverlayEntry? childOverlayEntity;
 
   @override
   void initState() {
     super.initState();
-    _overlayEntry = EasyLoadingOverlayEntry(
+    EasyLoading.instance.overlayEntry?.remove();
+    EasyLoading.instance.overlayEntry?.dispose();
+    EasyLoading.instance.overlayEntry = null;
+    overlayEntry = EasyLoadingOverlayEntry(
       builder: (BuildContext context) => EasyLoading.instance.w ?? Container(),
     );
-    EasyLoading.instance.overlayEntry = _overlayEntry;
+    childOverlayEntity = EasyLoadingOverlayEntry(
+      builder: (BuildContext context) {
+        if (widget.child != null) {
+          return widget.child!;
+        } else {
+          return Container();
+        }
+      },
+    );
+    EasyLoading.instance.overlayEntry = overlayEntry;
+  }
+
+  @override
+  void dispose() {
+    childOverlayEntity?.remove();
+    childOverlayEntity?.dispose();
+    childOverlayEntity = null;
+    overlayEntry = null;
+    super.dispose();
   }
 
   @override
@@ -57,16 +79,8 @@ class _FlutterEasyLoadingState extends State<FlutterEasyLoading> {
       color: const Color(0x00000000),
       child: Overlay(
         initialEntries: [
-          EasyLoadingOverlayEntry(
-            builder: (BuildContext context) {
-              if (widget.child != null) {
-                return widget.child!;
-              } else {
-                return Container();
-              }
-            },
-          ),
-          _overlayEntry,
+          if (null != childOverlayEntity) childOverlayEntity!,
+          if (null != overlayEntry) overlayEntry!,
         ],
       ),
     );
