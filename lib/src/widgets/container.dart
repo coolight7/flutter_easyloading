@@ -144,47 +144,55 @@ class EasyLoadingContainerState extends State<EasyLoadingContainer>
   }
 
   void updateStatus(String status) {
-    if (_status == status) return;
+    if (_status == status) {
+      return;
+    }
     setState(() {
       _status = status;
     });
   }
 
   void _onTap() async {
-    if (_dismissOnTap) await EasyLoading.dismiss();
+    if (_dismissOnTap) {
+      await EasyLoading.dismiss();
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    final bgWidget = IgnorePointer(
+      ignoring: _ignoring,
+      child: _dismissOnTap
+          ? GestureDetector(
+              onTap: _onTap,
+              behavior: HitTestBehavior.translucent,
+              child: Container(
+                width: double.infinity,
+                height: double.infinity,
+                color: _maskColor,
+              ),
+            )
+          : Container(
+              width: double.infinity,
+              height: double.infinity,
+              color: _maskColor,
+            ),
+    );
     return Stack(
       alignment: _alignment,
       children: <Widget>[
-        AnimatedBuilder(
-          animation: _animationController,
-          builder: (BuildContext context, Widget? child) {
-            return Opacity(
-              opacity: _animationController.value,
-              child: IgnorePointer(
-                ignoring: _ignoring,
-                child: _dismissOnTap
-                    ? GestureDetector(
-                        onTap: _onTap,
-                        behavior: HitTestBehavior.translucent,
-                        child: Container(
-                          width: double.infinity,
-                          height: double.infinity,
-                          color: _maskColor,
-                        ),
-                      )
-                    : Container(
-                        width: double.infinity,
-                        height: double.infinity,
-                        color: _maskColor,
-                      ),
-              ),
-            );
-          },
-        ),
+        (widget.animation)
+            ? AnimatedBuilder(
+                animation: _animationController,
+                builder: (BuildContext context, Widget? child) {
+                  return Opacity(
+                    opacity: _animationController.value,
+                    child: child,
+                  );
+                },
+                child: bgWidget,
+              )
+            : bgWidget,
         SafeArea(
           child: AnimatedBuilder(
             animation: _animationController,

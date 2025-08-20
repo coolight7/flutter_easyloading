@@ -187,14 +187,14 @@ class EasyLoading {
   /// info widget of loading
   Widget? infoWidget;
 
-  Widget? _w;
+  Widget? _widget;
 
   EasyLoadingOverlayEntry? overlayEntry;
   GlobalKey<EasyLoadingContainerState>? _key;
   GlobalKey<EasyLoadingProgressState>? _progressKey;
   Timer? _timer;
 
-  Widget? get w => _w;
+  Widget? get widget => _widget;
   GlobalKey<EasyLoadingContainerState>? get key => _key;
   GlobalKey<EasyLoadingProgressState>? get progressKey => _progressKey;
 
@@ -223,7 +223,7 @@ class EasyLoading {
   }
 
   static EasyLoading get instance => _instance;
-  static bool get isShow => _instance.w != null;
+  static bool get isShow => _instance.widget != null;
 
   /// init EasyLoading
   static TransitionBuilder init({
@@ -243,6 +243,7 @@ class EasyLoading {
     Widget? indicator,
     EasyLoadingMaskType? maskType,
     bool? dismissOnTap,
+    bool enableAnimate = true,
   }) {
     Widget w =
         indicator ?? (_instance.indicatorWidget ?? const LoadingIndicator());
@@ -250,6 +251,7 @@ class EasyLoading {
       maskType: maskType,
       dismissOnTap: dismissOnTap,
       w: w,
+      enableAnimate: enableAnimate,
     );
   }
 
@@ -258,6 +260,7 @@ class EasyLoading {
     double value, {
     String? status,
     EasyLoadingMaskType? maskType,
+    bool enableAnimate = true,
   }) async {
     assert(
       value >= 0.0 && value <= 1.0,
@@ -271,7 +274,7 @@ class EasyLoading {
       );
     }
 
-    if (_instance.w == null || _instance.progressKey == null) {
+    if (_instance.widget == null || _instance.progressKey == null) {
       if (_instance.key != null) await dismiss(animation: false);
       GlobalKey<EasyLoadingProgressState> progressKey =
           GlobalKey<EasyLoadingProgressState>();
@@ -284,6 +287,7 @@ class EasyLoading {
         maskType: maskType,
         dismissOnTap: false,
         w: w,
+        enableAnimate: enableAnimate,
       );
       _instance._progressKey = progressKey;
     }
@@ -299,6 +303,7 @@ class EasyLoading {
     Duration? duration,
     EasyLoadingMaskType? maskType,
     bool? dismissOnTap,
+    bool enableAnimate = true,
   }) {
     Widget w = _instance.successWidget ??
         Icon(
@@ -312,6 +317,7 @@ class EasyLoading {
       maskType: maskType,
       dismissOnTap: dismissOnTap,
       w: w,
+      enableAnimate: enableAnimate,
     );
   }
 
@@ -321,6 +327,7 @@ class EasyLoading {
     Duration? duration,
     EasyLoadingMaskType? maskType,
     bool? dismissOnTap,
+    bool enableAnimate = true,
   }) {
     Widget w = _instance.errorWidget ??
         Icon(
@@ -334,6 +341,7 @@ class EasyLoading {
       maskType: maskType,
       dismissOnTap: dismissOnTap,
       w: w,
+      enableAnimate: enableAnimate,
     );
   }
 
@@ -343,6 +351,7 @@ class EasyLoading {
     Duration? duration,
     EasyLoadingMaskType? maskType,
     bool? dismissOnTap,
+    bool enableAnimate = true,
   }) {
     Widget w = _instance.infoWidget ??
         Icon(
@@ -356,6 +365,7 @@ class EasyLoading {
       maskType: maskType,
       dismissOnTap: dismissOnTap,
       w: w,
+      enableAnimate: enableAnimate,
     );
   }
 
@@ -366,6 +376,7 @@ class EasyLoading {
     EasyLoadingToastPosition? toastPosition,
     EasyLoadingMaskType? maskType,
     bool? dismissOnTap,
+    bool enableAnimate = true,
   }) {
     return _instance._show(
       status: status,
@@ -373,6 +384,7 @@ class EasyLoading {
       toastPosition: toastPosition ?? EasyLoadingTheme.toastPosition,
       maskType: maskType,
       dismissOnTap: dismissOnTap,
+      enableAnimate: enableAnimate,
     );
   }
 
@@ -412,6 +424,7 @@ class EasyLoading {
     EasyLoadingMaskType? maskType,
     bool? dismissOnTap,
     EasyLoadingToastPosition? toastPosition,
+    bool enableAnimate = true,
   }) async {
     assert(
       overlayEntry != null,
@@ -449,13 +462,15 @@ class EasyLoading {
     }
 
     toastPosition ??= EasyLoadingToastPosition.center;
-    bool animation = _w == null;
+    bool animation = (enableAnimate && _widget == null);
     _progressKey = null;
-    if (_key != null) await dismiss(animation: false);
+    if (_key != null) {
+      await dismiss(animation: false);
+    }
 
     Completer<void> completer = Completer<void>();
     _key = GlobalKey<EasyLoadingContainerState>();
-    _w = EasyLoadingContainer(
+    _widget = EasyLoadingContainer(
       key: _key,
       status: status,
       indicator: w,
@@ -490,7 +505,7 @@ class EasyLoading {
   }
 
   void _reset() {
-    _w = null;
+    _widget = null;
     _key = null;
     _progressKey = null;
     _cancelTimer();

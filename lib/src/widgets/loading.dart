@@ -50,14 +50,15 @@ class _FlutterEasyLoadingState extends State<FlutterEasyLoading> {
     EasyLoading.instance.overlayEntry?.dispose();
     EasyLoading.instance.overlayEntry = null;
     overlayEntry = EasyLoadingOverlayEntry(
-      builder: (BuildContext context) => EasyLoading.instance.w ?? Container(),
+      builder: (BuildContext context) =>
+          EasyLoading.instance.widget ?? const SizedBox(),
     );
     childOverlayEntity = EasyLoadingOverlayEntry(
       builder: (BuildContext context) {
         if (widget.child != null) {
           return widget.child!;
         } else {
-          return Container();
+          return const SizedBox();
         }
       },
     );
@@ -77,6 +78,7 @@ class _FlutterEasyLoadingState extends State<FlutterEasyLoading> {
   Widget build(BuildContext context) {
     return Material(
       color: const Color(0x00000000),
+      animationDuration: Duration.zero,
       child: Overlay(
         initialEntries: [
           if (null != childOverlayEntity) childOverlayEntity!,
