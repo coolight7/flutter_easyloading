@@ -28,6 +28,8 @@ import '../easy_loading.dart';
 import './overlay_entry.dart';
 
 class FlutterEasyLoading extends StatefulWidget {
+  static Widget Function(BuildContext context, Widget? content)? paddingBuilder;
+
   final Widget? child;
 
   const FlutterEasyLoading({
@@ -49,10 +51,11 @@ class _FlutterEasyLoadingState extends State<FlutterEasyLoading> {
     EasyLoading.instance.overlayEntry?.remove();
     EasyLoading.instance.overlayEntry?.dispose();
     EasyLoading.instance.overlayEntry = null;
-    overlayEntry = EasyLoadingOverlayEntry(
-      builder: (BuildContext context) =>
-          EasyLoading.instance.widget ?? const SizedBox(),
-    );
+    overlayEntry = EasyLoadingOverlayEntry(builder: (BuildContext context) {
+      final content = EasyLoading.instance.widget ?? const SizedBox();
+      return FlutterEasyLoading.paddingBuilder?.call(context, content) ??
+          content;
+    });
     childOverlayEntity = EasyLoadingOverlayEntry(
       builder: (BuildContext context) {
         if (widget.child != null) {
